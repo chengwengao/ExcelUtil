@@ -19,11 +19,11 @@ public class TestExportBean {
         Collection<Object> dataset=new ArrayList<Object>();
         dataset.add(new Model("", "", "",null));
         dataset.add(new Model(null, null, null,null));
-        dataset.add(new Model("王五", "34", "男",new Date()));
+        dataset.add(new Model("王五432jgjfjfgjfjjjjjjjjjjjjjjjjjjjjjjfhgy", "134", "男",new Date()));
         File f=new File("c:/test.xls");
         OutputStream out =new FileOutputStream(f);
         
-        ExcelUtil.exportExcel(map1, dataset, out);
+        ExcelUtil.exportExcel(map1, dataset, out,"用户信息测试" );
         out.close();
     }
 }

@@ -29,8 +29,8 @@ public class TestExportMap {
     map2.put("sex", null);
     map.put("birthday",null);
     Map<String,Object> map3 =new LinkedHashMap<String, Object>();
-    map3.put("name", "张三");
-    map3.put("age", 12);
+    map3.put("name", "张三1312");
+    map3.put("age", 121);
     map3.put("sex", "男");
     map3.put("birthday",new Date());
     list.add(map);
@@ -43,7 +43,7 @@ public class TestExportMap {
     map1.put("sex","性别");
     File f= new File("c:/test.xls");
     OutputStream out = new FileOutputStream(f);
-    ExcelUtil.exportExcel(map1,list, out );
+    ExcelUtil.exportExcel(map1,list, out,"用户信息测试123" );
     out.close();
   }
 }

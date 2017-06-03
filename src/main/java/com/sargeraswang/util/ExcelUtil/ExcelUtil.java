@@ -8,7 +8,9 @@ import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,8 +125,8 @@ public class ExcelUtil {
      *                javabean属性的数据类型有基本数据类型及String,Date,String[],Double[]
      * @param out     与输出设备关联的流对象，可以将EXCEL文档导出到本地文件或者网络中
      */
-    public static <T> void exportExcel(Map<String,String> headers, Collection<T> dataset, OutputStream out) {
-        exportExcel(headers, dataset, out, null);
+    public static <T> void exportExcel(Map<String,String> headers, Collection<T> dataset, OutputStream out,String sheetName) {
+        exportExcel(headers, dataset, out, null,sheetName);
     }
 
     /**
@@ -137,13 +139,14 @@ public class ExcelUtil {
      *                javabean属性的数据类型有基本数据类型及String,Date,String[],Double[]
      * @param out     与输出设备关联的流对象，可以将EXCEL文档导出到本地文件或者网络中
      * @param pattern 如果有时间数据，设定输出格式。默认为"yyy-MM-dd"
+     * @param sheetName 底部sheet名
      */
     public static <T> void exportExcel(Map<String,String> headers, Collection<T> dataset, OutputStream out,
-                                       String pattern) {
+                                       String pattern,String sheetName) {
         // 声明一个工作薄
         HSSFWorkbook workbook = new HSSFWorkbook();
         // 生成一个表格
-        HSSFSheet sheet = workbook.createSheet();
+        HSSFSheet sheet = workbook.createSheet(sheetName);
 
         write2Sheet(sheet, headers, dataset, pattern);
         try {
@@ -151,6 +154,37 @@ public class ExcelUtil {
         } catch (IOException e) {
             LG.error(e.toString(), e);
         }
+    }
+
+    /**
+     * 创建单元格
+     * @param row
+     * @param column
+     * @param style
+     * @param value
+     */
+//    private static void createCell(HSSFRow row, int column, HSSFCellStyle style, String value) {
+//        HSSFCell cell = row.createCell(column);
+//        cell.setCellValue(new HSSFRichTextString(value));
+//        if (null != style) {    //不指定样式则使用默认样式
+//            cell.getCellStyle().cloneStyleFrom(style);
+//        }
+//    }
+
+    /**
+     * 设置单元格样式
+     * @return
+     */
+    private static HSSFCellStyle setCellStyle(){
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFFont font = workbook.createFont();
+        font.setFontHeightInPoints((short) 12);
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        HSSFCellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        return style;
     }
 
     public static void exportExcel(String[][] datalist, OutputStream out) {
@@ -255,11 +289,6 @@ public class ExcelUtil {
                 c++;
             }
         }
-//        for (int i = 0; i < headers.length; i++) {
-//            HSSFCell cell = row.createCell(i);
-//            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-//            cell.setCellValue(text);
-//        }
 
         // 遍历集合数据，产生数据行
         Iterator<T> it = dataset.iterator();
@@ -341,16 +370,6 @@ public class ExcelUtil {
 
                         cellNum++;
                     }
-//                    for (String k : headers) {
-//                        if (map.containsKey(k) == false) {
-//                            LG.error("Map 中 不存在 key [" + k + "]");
-//                            continue;
-//                        }
-//                        Object value = map.get(k);
-//                        HSSFCell cell = row.createCell(cellNum);
-//                        cell.setCellValue(String.valueOf(value));
-//                        cellNum++;
-//                    }
                 } else {
                     List<FieldForSortting> fields = sortFieldByAnno(t.getClass());
                     int cellNum = 0;
