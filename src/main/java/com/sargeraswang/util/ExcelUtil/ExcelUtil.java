@@ -147,8 +147,16 @@ public class ExcelUtil {
         HSSFWorkbook workbook = new HSSFWorkbook();
         // 生成一个表格
         HSSFSheet sheet = workbook.createSheet(sheetName);
+        //设置表格头 样式
+        HSSFFont font = workbook.createFont();
+        font.setFontHeightInPoints((short) 12);
+        font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+        HSSFCellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 
-        write2Sheet(sheet, headers, dataset, pattern);
+        write2Sheet(sheet,style ,headers, dataset, pattern);
         try {
             workbook.write(out);
         } catch (IOException e) {
@@ -250,7 +258,16 @@ public class ExcelUtil {
         for (ExcelSheet<T> sheet : sheets) {
             // 生成一个表格
             HSSFSheet hssfSheet = workbook.createSheet(sheet.getSheetName());
-            write2Sheet(hssfSheet, sheet.getHeaders(), sheet.getDataset(), pattern);
+            HSSFSheet sheet1 = workbook.createSheet();
+            //设置表格头 样式
+            HSSFFont font = workbook.createFont();
+            font.setFontHeightInPoints((short) 12);
+            font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+            HSSFCellStyle style = workbook.createCellStyle();
+            style.setFont(font);
+            style.setAlignment(HSSFCellStyle.VERTICAL_CENTER);
+            style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+            write2Sheet(hssfSheet, style,sheet.getHeaders(), sheet.getDataset(), pattern);
         }
         try {
             workbook.write(out);
@@ -267,7 +284,7 @@ public class ExcelUtil {
      * @param dataset 数据集合
      * @param pattern 日期格式
      */
-    private static <T> void write2Sheet(HSSFSheet sheet, Map<String,String> headers, Collection<T> dataset,
+    private static <T> void write2Sheet(HSSFSheet sheet,HSSFCellStyle style, Map<String,String> headers, Collection<T> dataset,
                                         String pattern) {
         //时间格式默认"yyyy-MM-dd"
         if (StringUtils.isEmpty(pattern)){
@@ -286,6 +303,7 @@ public class ExcelUtil {
                 HSSFCell cell = row.createCell(c);
                 HSSFRichTextString text = new HSSFRichTextString(headers.get(key));
                 cell.setCellValue(text);
+                cell.setCellStyle(style);
                 c++;
             }
         }
