@@ -4,7 +4,7 @@
 
 	<groupId>com.sargeraswang.util</groupId>
 	<artifactId>excel-util</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>v1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>ExcelUtil</name>
@@ -83,4 +83,18 @@
             </plugin>
 		</plugins>
 	</build>
+
+	<!-- 发布选项: id必须与setting.xml文件中server的id相同 -->
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>Releases</name>
+			<url>http://192.168.0.41:8081/repository/maven-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Snapshot</name>
+			<url>http://192.168.0.41:8081/repository/maven-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

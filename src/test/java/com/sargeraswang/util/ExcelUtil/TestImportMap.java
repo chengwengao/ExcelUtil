@@ -19,12 +19,12 @@ import java.util.Map;
 public class TestImportMap {
   @SuppressWarnings("rawtypes")
   public static void main(String[] args) throws FileNotFoundException {
-    File f=new File("/Users/SagerasWang/Desktop/test.xls");
+    File f=new File("G:/Docs/citms/codes/KeyPersonControlWeb/service/blade-service/citms-web/src/main/resources/template/算法引擎导入模板.xls");
     InputStream inputStream= new FileInputStream(f);
-    
+
     ExcelLogs logs =new ExcelLogs();
-    Collection<Map> importExcel = ExcelUtil.importExcel(Map.class, inputStream, "yyyy/MM/dd HH:mm:ss", logs , 0);
-    
+    Collection<Map> importExcel = ExcelUtil.importExcel(Map.class, inputStream, "yyyy/MM/dd HH:mm:ss", logs , 1, 0);
+
     for(Map m : importExcel){
       System.out.println(m);
     }

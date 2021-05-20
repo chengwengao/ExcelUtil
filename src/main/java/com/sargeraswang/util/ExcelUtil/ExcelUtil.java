@@ -8,9 +8,7 @@ import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -474,13 +472,14 @@ public class ExcelUtil {
      * @param inputStream excel输入流
      * @param pattern     如果有时间数据，设定输入格式。默认为"yyy-MM-dd"
      * @param logs        错误log集合
+     * @param dataRowIndex  开始读取的数据行数，从0开始，默认值0，如果首行放置说明，则正文内容从第2行开始读取，即dataRowIndex=1
      * @param arrayCount  如果vo中有数组类型,那就按照index顺序,把数组应该有几个值写上.
      * @return voList
      * @throws RuntimeException
      */
     @SuppressWarnings("unchecked")
     public static <T> Collection<T> importExcel(Class<T> clazz, InputStream inputStream,
-                                                String pattern, ExcelLogs logs, Integer... arrayCount) {
+                                                String pattern, ExcelLogs logs, Integer dataRowIndex, Integer... arrayCount) {
         HSSFWorkbook workBook = null;
         try {
             workBook = new HSSFWorkbook(inputStream);
@@ -494,10 +493,9 @@ public class ExcelUtil {
             List<ExcelLog> logList = new ArrayList<ExcelLog>();
             // Map<title,index>
             Map<String, Integer> titleMap = new HashMap<>();
-
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
-                if (row.getRowNum() == 0) {
+                if (row.getRowNum() == dataRowIndex) {
                     if (clazz == Map.class) {
                         // 解析map用的key,就是excel标题行
                         Iterator<Cell> cellIterator = row.cellIterator();
@@ -530,10 +528,29 @@ public class ExcelUtil {
                     Map<String, Object> map = new HashMap<String, Object>();
                     for (String k : titleMap.keySet()) {
                         Integer index = titleMap.get(k);
-                        String value = row.getCell(index).getStringCellValue();
-                        map.put(k, value);
+                        Cell rowCell = row.getCell(index);
+                        if (null != rowCell) {
+                            switch (rowCell.getCellType()) {
+                                case Cell.CELL_TYPE_STRING:
+                                    map.put(k, rowCell.getStringCellValue());
+                                    break;
+                                case Cell.CELL_TYPE_NUMERIC:
+                                    map.put(k, rowCell.getNumericCellValue());
+                                    break;
+                                case Cell.CELL_TYPE_BOOLEAN:
+                                    map.put(k, rowCell.getBooleanCellValue());
+                                    break;
+                                case Cell.CELL_TYPE_BLANK:
+                                    map.put(k, "");
+                                    break;
+                                default:
+                                    map.put(k, rowCell.toString().trim());
+                            }
+                        }
                     }
-                    list.add((T) map);
+                    if (map.size() > 0) {
+                        list.add((T) map);
+                    }
 
                 } else {
                     t = clazz.newInstance();
